@@ -156,13 +156,13 @@ public class BuildResultScoringRule extends ScoringRule {
                 int scale = getScale() + getScaleAdjustForOlder() * pastNum;
 
                 if (Result.SUCCESS == build.getResult()) {
-                    nodesScore.addScore(node, getScoreForSuccess() * scale);
+                    nodesScore.addScore(node, getScoreForSuccess() * scale,"SUCCESS");
                     nodeSet.remove(node);
                 } else if (Result.FAILURE == build.getResult()) {
-                    nodesScore.addScore(node, getScoreForFailure() * scale);
+                    nodesScore.addScore(node, getScoreForFailure() * scale ,"FAILURE");
                     nodeSet.remove(node);
                 } else if (Result.UNSTABLE == build.getResult()) {
-                    nodesScore.addScore(node, getScoreForUnstable() * scale);
+                    nodesScore.addScore(node, getScoreForUnstable() * scale, "UNSTABLE");
                     nodeSet.remove(node);
                 }
             }

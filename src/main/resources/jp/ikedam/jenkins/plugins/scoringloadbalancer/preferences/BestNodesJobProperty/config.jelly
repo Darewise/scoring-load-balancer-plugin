@@ -1,0 +1,11 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:optionalBlock name="enableDarewiseScoring" field="enableDarewiseScoring" title="Use Darewise Scoring">
+        <f:entry title="Best Node Label" field="label">
+            <f:textbox />
+        </f:entry>
+        <f:entry title="Required disc space [Gb]" field="minFreeSpace">
+            <f:number/>
+        </f:entry>
+    </f:optionalBlock>
+</j:jelly>

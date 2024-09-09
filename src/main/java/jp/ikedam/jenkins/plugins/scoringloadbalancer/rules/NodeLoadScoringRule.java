@@ -111,7 +111,7 @@ public class NodeLoadScoringRule extends ScoringRule {
 
             int busyScore = busy * getScoreForBusyExecutor();
             int idleScore = idle * getScoreForIdleExecutor();
-            nodesScore.addScore(ec, (busyScore + idleScore) * getScale());
+            nodesScore.addScore(ec, (busyScore + idleScore) * getScale(), "busy/idle");
         }
 
         return true;

@@ -107,7 +107,7 @@ public class NodePreferenceScoringRule extends ScoringRule {
                 continue;
             }
             BuildPreferenceNodeProperty pref = prefList.get(0);
-            nodesScore.addScore(node, pref.getPreference() * getNodesPreferenceScale());
+            nodesScore.addScore(node, pref.getPreference() * getNodesPreferenceScale(), "preference points");
         }
 
         // scores by preference configured in projects.
@@ -124,7 +124,7 @@ public class NodePreferenceScoringRule extends ScoringRule {
                         if (!l.contains(node)) {
                             continue;
                         }
-                        nodesScore.addScore(node, pref.getPreference() * getProjectPreferenceScale());
+                        nodesScore.addScore(node, pref.getPreference() * getProjectPreferenceScale(),"project preference");
                     }
                 } catch (IllegalArgumentException e) {
                     LOGGER.log(

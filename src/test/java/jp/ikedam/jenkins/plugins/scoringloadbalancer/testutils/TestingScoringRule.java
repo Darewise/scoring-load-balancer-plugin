@@ -74,7 +74,7 @@ public class TestingScoringRule extends ScoringRule {
                     nodesScore.resetScore(node);
                 }
                 if (scoreMap.containsKey(node)) {
-                    nodesScore.addScore(node, scoreMap.get(node));
+                    nodesScore.addScore(node, scoreMap.get(node),"test");
                 }
             }
         } else {

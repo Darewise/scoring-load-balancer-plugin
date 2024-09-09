@@ -29,6 +29,7 @@ import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
+import hudson.model.Job;
 import hudson.model.LoadBalancer;
 import hudson.model.Node;
 import hudson.model.Queue;
@@ -100,8 +101,35 @@ public class ScoringLoadBalancer extends LoadBalancer implements Describable<Sco
      *
      * @return whether this LoadBalancer is enabled.
      */
-    public boolean isEnabled() {
-        return getDescriptor().isEnabled();
+    public boolean isEnabled(Queue.Task task) {
+        if (getDescriptor().isEnabled()) {
+            if (getDescriptor().testing) {
+                return true;
+            }
+            Task originalTask = task.getOwnerTask();
+            LOGGER.log(Level.INFO, "Darewise testing getUseDarewiseScoring", task.getClass().getName());
+            LOGGER.log(Level.INFO, "Darewise task: '{0}'", task.getClass().getName());
+            if (originalTask instanceof WorkflowJob) {
+                Job<?, ?> job = (Job<?, ?>) originalTask;
+                BestNodesJobProperty property = job.getProperty(BestNodesJobProperty.class);
+                if (property != null) {
+                    if (property.isEnableDarewiseScoring()) {
+                        LOGGER.log(Level.INFO, String.format("Darewise scoring enabled for job: '%s'", job.getFullName()));
+                        return true;
+                    }else
+                    {
+                        LOGGER.log(Level.INFO, String.format("Darewise scoring disabled for job: '%s'", job.getFullName()));                        
+                    }
+                }else
+                {
+                    LOGGER.log(Level.INFO, String.format("Darewise property is null for job: %s", job.getFullName()));
+                }
+            }
+            else{
+                LOGGER.log(Level.INFO, "Darewise originalTask class name is: {0}", originalTask.getClass().getName());
+            }
+        }
+        return false;
     }
 
     /**
@@ -275,7 +303,9 @@ public class ScoringLoadBalancer extends LoadBalancer implements Describable<Sco
      */
     @Extension
     public static class DescriptorImpl extends Descriptor<ScoringLoadBalancer> {
+
         private boolean enabled = true;
+        private boolean testing = false;
 
         /**
          * Returns whether ScoringLoadBalancer is enabled
@@ -348,6 +378,7 @@ public class ScoringLoadBalancer extends LoadBalancer implements Describable<Sco
          */
         public boolean configure(boolean enabled, boolean reportScoresEnabled, List<ScoringRule> scoringRuleList) {
             this.enabled = enabled;
+            this.testing = true;
             this.reportScoresEnabled = reportScoresEnabled;
             this.scoringRuleList = scoringRuleList;
             save();
@@ -363,6 +394,7 @@ public class ScoringLoadBalancer extends LoadBalancer implements Describable<Sco
          * @return
          */
         public boolean configure(boolean enabled, boolean reportScoresEnabled, ScoringRule... scoringRules) {
+            this.testing = enabled;
             return configure(enabled, reportScoresEnabled, Arrays.asList(scoringRules));
         }
 
@@ -395,6 +427,7 @@ public class ScoringLoadBalancer extends LoadBalancer implements Describable<Sco
      * A node with a larger score is preferred to use.
      */
     public static class NodesScore {
+
         private Map<Node, ExecutorChunk> nodeExecutorMap;
         private Map<ExecutorChunk, Integer> executorScoreMap;
         private Set<ExecutorChunk> invalidExecutors;
@@ -557,6 +590,7 @@ public class ScoringLoadBalancer extends LoadBalancer implements Describable<Sco
          * Comparator for sorting {@link ExecutorChunk}
          */
         public class ExecutorComparator implements Comparator<ExecutorChunk> {
+
             @Override
             public int compare(ExecutorChunk o1, ExecutorChunk o2) {
                 return getScore(o2) - getScore(o1);
